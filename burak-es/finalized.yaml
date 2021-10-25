@@ -1,0 +1,100 @@
+---
+# Source: burak-es/templates/elastic-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: default
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    name: elasticsearch
+  ports:
+    - protocol: TCP
+      name: client
+      port: 9200
+      targetPort: 9200
+  type: LoadBalancer
+---
+# Source: burak-es/templates/kibana-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: default
+  labels:
+    app: kibana
+spec:
+  selector:
+    name: kibana
+  ports:
+    - protocol: TCP
+      name: client
+      port: 5601
+      targetPort: 5601
+  type: LoadBalancer
+---
+# Source: burak-es/templates/elastic-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: default
+  labels:
+    app: elasticsearch
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: elasticsearch
+  template:
+    metadata:
+      labels:
+        name: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: elasticsearch:6.8.20
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms1g -Xmx1g
+          resources:
+            limits:
+              memory: 1500Mi
+            requests:
+              cpu: 250m
+              memory: 1500Mi
+      terminationGracePeriodSeconds: 30
+---
+# Source: burak-es/templates/kibana-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: default
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: kibana
+  template:
+    metadata:
+      labels:
+        name: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: frapsoft/kibana-xpack:latest
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms1g -Xmx1g
+          resources:
+            limits:
+              memory: 1500Mi
+            requests:
+              cpu: 250m
+              memory: 1500Mi
+      terminationGracePeriodSeconds: 30

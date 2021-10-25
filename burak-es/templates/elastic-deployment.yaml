@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.elastic.app.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.elastic.app.name }}
+spec:
+  replicas: {{ .Values.elastic.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ .Values.elastic.app.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.elastic.app.name }}
+    spec:
+      containers:
+        - name: {{ .Values.elastic.app.name }}
+          image: {{ .Values.elastic.image.repository }}:{{ .Values.elastic.image.tag }}
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms1g -Xmx1g
+          - name: CLUSTER_NAME
+            value: elasticsearch
+          - name: NODE_NAME
+            value: elasticsearch-master
+          - name: NODE_LIST
+            value: elasticsearch-master,elasticsearch-data,elasticsearch-client
+          - name: MASTER_NODES
+            value: elasticsearch-master
+          resources:
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+      terminationGracePeriodSeconds: 30

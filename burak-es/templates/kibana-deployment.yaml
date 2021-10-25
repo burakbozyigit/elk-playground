@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.kibana.app.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.kibana.app.name }}
+spec:
+  replicas: {{ .Values.kibana.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ .Values.kibana.app.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.kibana.app.name }}
+    spec:
+      containers:
+        - name: {{ .Values.kibana.app.name }}
+          image: {{ .Values.kibana.image.repository }}:{{ .Values.kibana.image.tag }}
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms1g -Xmx1g
+          resources:
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+      terminationGracePeriodSeconds: 30
