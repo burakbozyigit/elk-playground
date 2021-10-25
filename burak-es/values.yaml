@@ -20,10 +20,10 @@ kibana:
   app:
     name: kibana
   image:
-    repository: frapsoft/kibana-xpack
+    repository: kibana
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "latest"
+    tag: "6.8.20"
   service:
     type: LoadBalancer
 
